@@ -1,29 +1,25 @@
-# LinkedIn Jobs Scraper - واجهة ويب
+# 💼 LinkedIn Jobs Scraper & Search Engine
 
-تطبيق بسيط بواجهة رسومية (Streamlit) للبحث عن وظائف على LinkedIn وتحميل النتائج كـ CSV.
+An interactive web application built with **Streamlit** to search LinkedIn job postings and export results to CSV—no login required.
 
-## طريقة النشر (5 دقايق، مجاني، وهتاخد رابط تبعته لأي حد)
+🚀 **Live Demo:** [Click Here to Open the App](https://job-scrabbing-oauvga2yumuhttqoxgoxbm.streamlit.app/)
 
-### الخطوة 1: ارفع الملفات على GitHub
-1. اعمل حساب على [github.com](https://github.com) لو معندكش.
-2. اعمل Repository جديد (public).
-3. ارفع فيه الملفين:
-   - `app.py`
-   - `requirements.txt`
+---
 
-### الخطوة 2: انشر على Streamlit Community Cloud
-1. روح على [share.streamlit.io](https://share.streamlit.io)
-2. سجل دخول بحساب GitHub بتاعك (مجاني تمامًا).
-3. دوس **"New app"**.
-4. اختار الـ Repository اللي رفعته، وحدد الملف الرئيسي: `app.py`
-5. دوس **Deploy**.
-6. بعد دقيقة أو اتنين هيديك رابط زي:
-   `https://your-app-name.streamlit.app`
+## ⚡ Quick Start
+You don't need to install anything! Just open the **[Live Demo](https://job-scrabbing-oauvga2yumuhttqoxgoxbm.streamlit.app/)** link above to search for jobs and download the CSV results directly.
 
-7. ابعت الرابط ده لأي حد، وهيقدر يفتحه من المتصفح مباشرة (موبايل أو كمبيوتر) من غير ما يحمل أي برنامج.
+---
 
-## ملحوظات مهمة
+## ✨ Features
+* **No Authentication:** Uses public endpoints, so no LinkedIn account setup is required.
+* **Interactive Interface:** Easy-to-use search and filter options powered by Streamlit.
+* **Instant Export:** Download search results as a structured `CSV` file with one click.
+* **Cross-Platform:** Works seamlessly on both desktop and mobile browsers.
 
-- ده بيستخدم صفحات LinkedIn العامة (Guest API)، فمفيش تسجيل دخول مطلوب، لكن لو حد استخدمه كتير أو بسرعة عالية ممكن LinkedIn يحظر الـ IP بتاع السيرفر مؤقتًا.
-- لو حابب تحمي التطبيق من الاستخدام الكتير (Rate limiting) قولّي وأظبطلك ده.
-- Streamlit Community Cloud مجاني بالكامل للمشاريع الصغيرة/الشخصية.
+---
+
+## 🛠️ Tech Stack
+* **Language:** Python 3.x
+* **UI Framework:** Streamlit
+* **Deployment:** Streamlit Community Cloud
