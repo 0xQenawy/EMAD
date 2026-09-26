@@ -1,12 +1,18 @@
 import html
+import logging
 import random
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 from urllib.parse import quote_plus
 import requests
 from bs4 import BeautifulSoup 
+
+from sources import BaseJobSource, LinkedInSource, RemotiveSource, TanqeebSource, UnifiedJob
+from dedup import JobDeduplicator
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -957,3 +963,154 @@ class LinkedInScraper:
         ranked_jobs = sorted(raw_jobs, key=lambda j: j["relevance_score"], reverse=True)
 
         return ranked_jobs
+
+
+class JobDiscoveryEngine:
+    """
+    Multi-Source Job Discovery Engine.
+    Executes discovery pipeline:
+    Discovery -> Extraction -> Normalization -> Classification -> Hard Filtering -> Deduplication -> Relevance Ranking
+    """
+
+    def __init__(self, sources: Optional[List[BaseJobSource]] = None):
+        self.sources = sources or [LinkedInSource(), TanqeebSource()]
+        self.classifier = JobClassifier()
+        self.last_metrics: Dict[str, Any] = {
+            "source_counts": {},
+            "total_discovered": 0,
+            "passed_filters": 0,
+            "duplicates_merged": 0,
+            "unique_opportunities": 0,
+        }
+
+    def discover(
+        self,
+        keywords: List[str],
+        location: str,
+        job_type: str = "all",
+        seniority: str = "all",
+        workplace_type: str = "all",
+        date_posted: str = "all",
+        pages_per_keyword: int = 2,
+        progress_callback: Optional[Callable[[float, str], None]] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Orchestrate multi-source discovery, filtering, deduplication, and ranking.
+        """
+        clean_keywords, effective_job_type, effective_seniority = self.classifier.normalize_search_intent(
+            keywords=keywords,
+            job_type=job_type,
+            seniority=seniority,
+        )
+        if not clean_keywords:
+            return []
+
+        def safe_progress(pct: float, msg: str):
+            if progress_callback:
+                try:
+                    progress_callback(pct, msg)
+                except Exception:
+                    pass
+
+        raw_discovered: List[UnifiedJob] = []
+        source_counts: Dict[str, int] = {}
+        total_sources = len(self.sources)
+
+        # 1. Discovery & Extraction across all configured sources
+        for idx, source in enumerate(self.sources):
+            source_pct_start = 0.05 + (idx / total_sources) * 0.55
+            safe_progress(
+                source_pct_start,
+                f"عماد بينكش في {source.source_name} على {', '.join(clean_keywords)}...",
+            )
+            try:
+                extracted = source.search(
+                    keywords=clean_keywords,
+                    location=location,
+                    job_type=effective_job_type,
+                    seniority=effective_seniority,
+                    workplace_type=workplace_type,
+                    date_posted=date_posted,
+                    limit_per_query=25 * pages_per_keyword,
+                )
+                source_counts[source.source_name] = len(extracted)
+                raw_discovered.extend(extracted)
+            except Exception as src_err:
+                logger.error(f"Error executing source {source.source_name}: {src_err}", exc_info=True)
+                source_counts[source.source_name] = 0
+
+        safe_progress(0.65, "عماد بيفرز البيانات ويصنف مستويات الخبرة ونوع العمل...")
+
+        # 2. Classification & Normalization across all discovered jobs
+        primary_kw = clean_keywords[0] if clean_keywords else ""
+        classified_jobs: List[UnifiedJob] = []
+
+        for job in raw_discovered:
+            # Seniority classification
+            job.seniority = self.classifier.detect_seniority(job.title)
+
+            # Job type classification
+            detected_type = self.classifier.detect_job_type(job.title)
+            if detected_type == "غير محدد" and effective_job_type == "contract":
+                detected_type = "عقد / عمل حر (Contract)"
+            job.job_type = detected_type
+
+            # Workplace classification
+            job.workplace_type = self.classifier.detect_workplace(job.title, job.location)
+
+            classified_jobs.append(job)
+
+        safe_progress(0.75, "عماد بيطبق الفلاتر الصارمة عشان يستبعد أي حاجة مش مطابقة...")
+
+        # 3. Hard Filtering (Filter out irrelevant roles BEFORE deduplication)
+        passed_filter_jobs: List[UnifiedJob] = []
+        for job in classified_jobs:
+            # Derive original matching keyword if stored in raw_source_data
+            matching_kw = job.raw_source_data.get("keyword", primary_kw)
+
+            if not self.classifier.passes_hard_filter(
+                title=job.title,
+                company=job.company,
+                requested_keyword=matching_kw,
+                requested_job_type=effective_job_type,
+                requested_seniority=effective_seniority,
+            ):
+                continue
+
+            passed_filter_jobs.append(job)
+
+        safe_progress(0.85, "عماد بيشيل الوظائف المكررة بين المصادر ويدمجها بذكاء...")
+
+        # 4. Multi-Signal Deduplication
+        unique_jobs, dup_count = JobDeduplicator.deduplicate_jobs(passed_filter_jobs)
+
+        safe_progress(0.92, "عماد بيرتب الفرص بالأكثر دقة وملاءمة لطلبك...")
+
+        # 5. Relevance Ranking
+        for job in unique_jobs:
+            matching_kw = job.raw_source_data.get("keyword", primary_kw)
+            job.relevance_score = self.classifier.calculate_relevance(
+                title=job.title,
+                requested_keyword=matching_kw,
+                requested_job_type=effective_job_type,
+                requested_seniority=effective_seniority,
+                location=job.location,
+                target_location=location,
+            )
+
+        # Sort descending by relevance score
+        ranked_jobs = sorted(unique_jobs, key=lambda j: j.relevance_score, reverse=True)
+
+        # Store discovery diagnostics
+        self.last_metrics = {
+            "source_counts": source_counts,
+            "total_discovered": len(raw_discovered),
+            "passed_filters": len(passed_filter_jobs),
+            "duplicates_merged": dup_count,
+            "unique_opportunities": len(ranked_jobs),
+        }
+
+        safe_progress(1.0, "عماد فرز كل المصادر ورتبلك الفرص الحقيقية من غير تكرار!")
+
+        return [j.to_dict() for j in ranked_jobs]
+

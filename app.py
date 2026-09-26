@@ -5,7 +5,7 @@ import streamlit as st
 import scraper
 
 importlib.reload(scraper)
-from scraper import LinkedInScraper
+from scraper import JobDiscoveryEngine, LinkedInScraper
 
 # Page configuration
 st.set_page_config(
@@ -458,6 +458,31 @@ st.markdown(
         color: #ffa657;
         font-weight: 600;
     }
+    .job-badge-source-linkedin {
+        background: rgba(10, 102, 194, 0.15);
+        border-color: rgba(10, 102, 194, 0.4);
+        color: #70b5f9;
+        font-weight: 700;
+    }
+    .job-badge-source-remotive {
+        background: rgba(235, 87, 87, 0.15);
+        border-color: rgba(235, 87, 87, 0.4);
+        color: #ff8585;
+        font-weight: 700;
+    }
+    .job-badge-source-tanqeeb {
+        background: rgba(46, 160, 67, 0.15);
+        border-color: rgba(46, 160, 67, 0.45);
+        color: #56d364;
+        font-weight: 700;
+    }
+    .job-badge-source-multi {
+        background: linear-gradient(135deg, rgba(10, 102, 194, 0.25), rgba(235, 87, 87, 0.25));
+        border-color: rgba(163, 113, 247, 0.6);
+        color: #d2a8ff;
+        font-weight: 700;
+        box-shadow: 0 0 8px rgba(163, 113, 247, 0.25);
+    }
     .job-card-action {
         flex-shrink: 0;
     }
@@ -736,7 +761,7 @@ if search_clicked:
     else:
         search_attempted = True
         effective_location = target_location_query.strip()
-        scraper = LinkedInScraper()
+        engine = JobDiscoveryEngine()
         progress_bar = st.progress(0)
         status_box = st.empty()
 
@@ -748,8 +773,8 @@ if search_clicked:
                 pass
 
         try:
-            with st.spinner("عماد شمّر ونازل يفرك في LinkedIn.. ثواني وجايلك بالتفاصيل"):
-                jobs = scraper.scrape(
+            with st.spinner("عماد شمّر ونازل يدور في LinkedIn و Tanqeeb.. ثواني وجايلك بالفرص"):
+                jobs = engine.discover(
                     keywords=keywords,
                     location=effective_location,
                     job_type=selected_job_type,
@@ -760,6 +785,7 @@ if search_clicked:
                     progress_callback=update_progress,
                 )
             st.session_state["scraped_jobs"] = jobs
+            st.session_state["discovery_metrics"] = getattr(engine, "last_metrics", {})
         except Exception as e:
             search_attempted = False
             st.session_state["scraped_jobs"] = []
@@ -795,7 +821,7 @@ if results:
         col3_metric_val = len(df[df["نوع الوظيفة"].str.contains("تدريب|Intern", na=False)])
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("إجمالي اللي لقاه عماد", total_jobs)
+    col1.metric("إجمالي الفرص الفريدة", total_jobs)
     col2.metric("شركات بتطلب", unique_companies)
     col3.metric(col3_metric_label, col3_metric_val)
     col4.metric("شغل من البيت (Remote)", remote_count)
@@ -804,13 +830,13 @@ if results:
 
     top_bar_col1, top_bar_col2 = st.columns([3, 1])
     with top_bar_col1:
-        st.success(f"لقينا {total_jobs} فرصة شغل/تدريب تناسب طلبك.")
+        st.success(f"لقينا {total_jobs} فرصة شغل/تدريب تناسب طلبك من مصادر متعددة بدون تكرار.")
     with top_bar_col2:
         csv_bytes = df.to_csv(index=False, encoding="utf-8-sig").encode("utf-8-sig")
         st.download_button(
             label="نزّل اللستة دي شيت Excel",
             data=csv_bytes,
-            file_name="عماد_لقالك_شغل_linkedin.csv",
+            file_name="عماد_فرص_عمل_متعددة_المصادر.csv",
             mime="text/csv",
             use_container_width=True,
         )
@@ -823,6 +849,25 @@ if results:
         job_type = html.escape(str(job.get("نوع الوظيفة", "غير محدد")))
         post_date = html.escape(str(job.get("تاريخ النشر", "غير محدد")))
         link = job.get("رابط التقديم", "#")
+
+        sources = job.get("sources", [])
+        if not sources:
+            raw_source = str(job.get("المصدر", "LinkedIn"))
+            sources = [s.strip() for s in raw_source.split("+") if s.strip()]
+
+        if len(sources) > 1:
+            sources_label = " · ".join(sources)
+            source_html = f'<span class="job-badge job-badge-source-multi">✨ {sources_label}</span>'
+            btn_text = "قدّم على الرابط المباشر ↗"
+        elif "Tanqeeb" in sources:
+            source_html = '<span class="job-badge job-badge-source-tanqeeb">Tanqeeb (تنقيب)</span>'
+            btn_text = "قدّم على Tanqeeb ↗"
+        elif "Remotive" in sources:
+            source_html = '<span class="job-badge job-badge-source-remotive">Remotive</span>'
+            btn_text = "قدّم على Remotive ↗"
+        else:
+            source_html = '<span class="job-badge job-badge-source-linkedin">LinkedIn</span>'
+            btn_text = "قدّم على LinkedIn ↗"
 
         seniority = html.escape(str(job.get("مستوى الخبرة", "غير محدد")))
         seniority_html = f'<span class="job-badge job-badge-seniority">{seniority}</span>' if seniority != "غير محدد" else ""
@@ -856,6 +901,7 @@ if results:
             f'<div class="job-company">{company}</div>'
             f'</div>'
             f'<div class="job-badges">'
+            f'{source_html}'
             f'<span class="job-badge job-badge-loc">{loc}</span>'
             f'{type_html}'
             f'{seniority_html}'
@@ -865,7 +911,7 @@ if results:
             f'</div>'
             f'<div class="job-card-action">'
             f'<a href="{link}" target="_blank" rel="noopener noreferrer" class="job-apply-btn">'
-            f'قدّم على LinkedIn ↗'
+            f'{btn_text}'
             f'</a>'
             f'</div>'
             f'</div>'

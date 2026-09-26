@@ -1,77 +1,116 @@
-# 💼 Emad | Smart LinkedIn Job & Internship Finder
+# 🚀 Emad (عماد) | Multi-Source Job & Internship Discovery Engine
 
-> **"Stop drowning in LinkedIn's noise every day. Put Emad to work—get precisely tailored jobs and internships with zero clutter, and stay relaxed."**
+<div align="center">
 
-**Emad** is an intelligent, high-precision LinkedIn job and internship discovery engine built with **Python** and **Streamlit**. It delivers accurate, filtered opportunities directly from LinkedIn without requiring account credentials, logins, or paid subscriptions.
+> *"قول إنت بتدور على إيه.. وعماد هيتصرف"*  
+> **Stop juggling tabs across job portals. Emad aggregates, classifies, and deduplicates opportunities across LinkedIn and regional Arab job networks into one clean dashboard.**
 
----
+[![Python Version](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.38%2B-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Beautiful Soup](https://img.shields.io/badge/Beautiful_Soup-4.12-4B8BBE?style=for-the-badge)](https://pypi.org/project/beautifulsoup4/)
+[![Status](https://img.shields.io/badge/Status-Active-2ea043?style=for-the-badge)]()
+[![Platform](https://img.shields.io/badge/Target-Egypt_·_Saudi_·_UAE-orange?style=for-the-badge)]()
 
-## 🌟 Key Highlights & Engine Architecture
-
-### 1. High-Precision Filtering (Zero False Positives)
-- **Title-First Classification Engine (`JobClassifier`):** Classifies positions based strictly on verified job titles and explicit signals rather than ambiguous keyword mentions in descriptions.
-- **No Unsubstantiated Assumptions:** Does not default unspecified titles (e.g., *"Software Engineer"*) to Full-time unless clear, verified evidence exists in the posting.
-- **Hard Gate Internship Gatekeeper:** When searching for an **Internship**, the engine strictly blocks:
-  - Any senior or leadership roles (`Senior`, `Sr.`, `Lead`, `Team Lead`, `Staff`, `Principal`, `Manager`, `Architect`, `Director`, `Head`, `VP`, `Chief`).
-  - Any position with explicit prior experience requirements (e.g., `1–2 years of experience`, `2+ years`, `3-5 years`).
-  - Conflicting professional domains (e.g., Marketing or Accounting roles when searching for Software or Data roles).
-- **Smart Intent Normalization (`normalize_search_intent`):** Handles compound inputs such as `Flutter intern`, `Flutter, intern`, or selecting the `Internship` radio button. It isolates the core discipline (`Flutter`), sets the search intent to `Internship`, and prevents irrelevant cross-domain noise.
-
-### 2. Granular Seniority & Work Mode Categorization
-- **Seniority Level Filter (`مستوى الخبرة`):**
-  - `الكل (أي مستوى)` - Any experience level
-  - `تدريب طلبة وخريجين (Internship)` - Dedicated internships and graduate training programs
-  - `مبتدئ / حديث تخرج (Junior / Entry)` - Strictly filters for entry-level roles, blocking Senior/Lead and 3+ years experience
-  - `متوسط الخبرة (Mid-Level)` - Targets intermediate roles, excluding interns and executives
-  - `سينيور / خبير (Senior / Lead)` - Strictly filters for Senior/Lead/Architect roles, excluding juniors and interns
-  - `إدارة وقيادة (Manager / Director)` - Targets managerial and executive leadership roles
-- **Job Types (`نوع الشغلانة / نظام التعاقد`):**
-  - `All (الكل)`
-  - `Full-time (دوام كامل)`
-  - `Part-time (دوام جزئي)`
-  - `Contract / Freelance (عقد / عمل حر)`
-- **Workplace Environments:**
-  - `Remote (عن بُعد - من البيت)`
-  - `Hybrid (هجين)`
-  - `On-site (من المقر)`
-  - `All (الكل)`
-
-### 3. Detailed Geographic Coverage
-- **Egypt 🇪🇬:** Cairo, Giza, Alexandria, Mansoura / Dakahlia, Tanta / Gharbia, Zagazig / Sharqia, Qalyubia, Menofia, Canal Cities, Upper Egypt, Red Sea, and South Sinai.
-- **Saudi Arabia 🇸🇦:** Riyadh, Jeddah, Eastern Province (Dammam / Khobar), Mecca, Medina.
-- **United Arab Emirates 🇦🇪:** Dubai, Abu Dhabi, Sharjah.
-- **Custom Worldwide Search 🌍:** Input any city or country globally to target postings directly.
-
-### 4. Posting Recency Filters
-- **Past 24 Hours (`طازة طازة`):** For early applications to maximize CV review visibility.
-- **Past Week (`أحسن فرصة للتقديم`):** Highest response rate window.
-- **Anytime (`المتاح كله`):** Comprehensive historical listings.
-
-### 5. Modern UI & Direct Application
-- **Direct Interactive Job Cards:** Clean dark theme with clear metadata badges and direct application buttons (`Apply on LinkedIn ↗`).
-- **Live Summary Metrics:** Real-time counts for Total Jobs, Unique Companies, Internships, and Remote positions.
-- **Arabic-Compliant Excel / CSV Export:** One-click download formatted with `UTF-8 with BOM` encoding for seamless Arabic text rendering in Microsoft Excel.
-- **Real-Time Cache Invalidation:** Automatically clears stale results the moment any search filter or keyword changes.
+</div>
 
 ---
 
-## 🚀 Quick Start (Local Setup)
+## 💡 What is Emad?
 
-### 1. Clone & Install Dependencies
+**Emad** is an intelligent, lightweight **Multi-Source Job Discovery Engine** designed specifically for job seekers, students, and professionals in **Egypt 🇪🇬, Saudi Arabia 🇸🇦, and the UAE 🇦🇪**.
 
-```bash
-git clone https://github.com/0xQenawy/job-scrabbing.git
-cd job-scaraping
-pip install -r requirements.txt
+Instead of manually checking multiple sites every day, getting bombarded with irrelevant leads, or seeing the exact same job reposted five times under slightly different titles, **Emad orchestrates the entire discovery process autonomously**:
+1. **Discovers** listings across independent sources (**LinkedIn** and **Tanqeeb**).
+2. **Classifies** seniority, contract types, and work environments using title-first rules.
+3. **Hard-Filters** out irrelevant roles before they ever reach your screen.
+4. **Deduplicates** cross-source duplicates using a conservative multi-signal confidence engine.
+5. **Ranks** results by relevance and presents them with direct apply links and source badges.
+
+> **Zero accounts, zero logins, zero API credentials required.** Emad uses clean, public, and stable guest endpoints.
+
+---
+
+## ⚙️ Engine Pipeline Architecture
+
+```text
+               1. Discovery & Extraction
+      ┌─────────────────────────┴────────────────────────┐
+      ▼                                                  ▼
+LinkedIn (Guest Search)                       Tanqeeb (Regional Network)
+   [Egypt · Saudi · UAE]                          [Egypt · Saudi · UAE]
+      │                                                  │
+      └─────────────────────────┬────────────────────────┘
+                                ▼
+                    2. Data Normalization
+               (Clean strings, URLs, legal suffixes)
+                                ▼
+                    3. Strict Classification
+            (Seniority · Job Type · Workplace Environment)
+                                ▼
+                    4. Hard Filtering Gate
+          (Rejects unqualified roles, senior mismatches, etc.)
+                                ▼
+                 5. Multi-Signal Deduplication
+               (Merges duplicates into: LinkedIn · Tanqeeb)
+                                ▼
+                    6. Relevance Ranking
+               (Weighted scoring: 0–100 match rating)
+                                ▼
+                    7. Modern UI Presentation
+          (Interactive job cards, direct apply buttons, CSV export)
 ```
 
-### 2. Run the Application
+---
 
-```bash
-streamlit run app.py
-```
+## 🌟 Key Features
 
-Open your browser at `http://localhost:8501`, set your desired role and location, and click **شوفلي الشغل يا عماد**.
+### 1. 🌐 True Multi-Source Discovery
+- **LinkedIn Integration (`LinkedInSource`):** Guest job search targeting relevant postings across MENA and globally.
+- **Tanqeeb Regional Network (`TanqeebSource`):** Automatic subdomain routing tailored to the user's selected country:
+  - **Egypt 🇪🇬:** Routed to `egypt.tanqeeb.com` (Cairo, Alexandria, Mansoura, Giza, etc.)
+  - **Saudi Arabia 🇸🇦:** Routed to `saudi.tanqeeb.com` (Riyadh, Jeddah, Dammam, Mecca, etc.)
+  - **United Arab Emirates 🇦🇪:** Routed to `uae.tanqeeb.com` (Dubai, Abu Dhabi, Sharjah, etc.)
+  - **Gulf & MENA:** Supports Kuwait, Qatar, Oman, Bahrain, and Jordan.
+- **Fault-Isolated Execution:** If one source experiences a temporary network hiccup, the other source continues seamlessly without crashing or surfacing stack traces.
+
+---
+
+### 2. 🛡️ Intelligent Multi-Signal Deduplication (`dedup.py`)
+> **Core Principle: "A false merge is far worse than an undetected duplicate."**
+
+Emad avoids naive `company + title` merges that hide real jobs. Instead, it uses a multi-signal confidence engine:
+- **Canonical URL Matching:** Cleans and normalizes URLs by stripping tracking queries (`utm_*`, `ref`, `trk`).
+- **Conservative Company Normalization:** Strips *only* pure legal suffixes (`LLC`, `Ltd`, `Inc`, `Corp`, `ش.م.م`). Crucial corporate identity tokens like `Technologies`, `Solutions`, `Systems`, and `Labs` are strictly preserved (e.g., *Smart Eye* and *Smart Eye Technologies* remain separate).
+- **Location Guardrails:** Same company and title in different cities (e.g., Cairo vs. Alexandria) are strictly kept as **2 separate jobs**.
+- **Smart Merging:** When verified as identical, the card is merged with dual badges (`✨ LinkedIn · Tanqeeb`) and points to the best direct application link.
+
+---
+
+### 3. 🎯 High-Precision Filtering (Zero False Positives)
+- **Hard-Gated Internship Filter:** When searching for internships or training programs:
+  - Rejects any leadership or senior title (`Senior`, `Lead`, `Staff`, `Architect`, `Director`, `Manager`, `Head`).
+  - Rejects postings with explicit experience requirements (e.g., `1–2 years`, `2+ yrs`, `خبرة 3 سنوات`).
+  - Excludes cross-domain noise (e.g., Marketing or HR roles when searching for Software).
+- **Smart Intent Normalization:** Typing `Flutter intern` automatically extracts the core skill (`Flutter`) and sets the seniority filter to `Internship`, preventing conflicting dork queries.
+- **Seniority Tiers:**
+  - `الكل (أي مستوى)` - All levels
+  - `تدريب طلبة وخريجين (Internship)` - Pure internships and graduate programs
+  - `مبتدئ / حديث تخرج (Junior / Entry)` - Entry-level roles, blocking senior and 3+ years requirements
+  - `متوسط الخبرة (Mid-Level)` - Mid-level opportunities
+  - `سينيور / خبير (Senior / Lead)` - Senior, Lead, and Architect roles
+  - `إدارة وقيادة (Manager / Director)` - Departmental and executive management
+- **Workplace Environments:** Remote (`عن بُعد`), Hybrid (`هجين`), or On-site (`من المقر`).
+
+---
+
+### 4. 🎨 Modern Dark Theme Interface
+- **Responsive RTL UI:** Styled with Google Cairo typography, glowing accent borders, and glassmorphic filter controls.
+- **Live Source Badges:**
+  - `LinkedIn` (Classic Blue)
+  - `Tanqeeb (تنقيب)` (Emerald Green)
+  - `✨ LinkedIn · Tanqeeb` (Gradient Purple for merged multi-source opportunities)
+- **Dynamic Apply Buttons:** Automatically adapts text based on the source (`قدّم على LinkedIn ↗`, `قدّم على Tanqeeb ↗`, or `قدّم على الرابط المباشر ↗`).
+- **Arabic Excel / CSV Export:** One-click download with `UTF-8 with BOM` encoding for seamless Arabic text display in Microsoft Excel.
 
 ---
 
@@ -79,15 +118,61 @@ Open your browser at `http://localhost:8501`, set your desired role and location
 
 ```text
 job-scaraping/
-├── app.py             # Streamlit web application, state management, and modern job cards UI
-├── scraper.py         # Precision LinkedIn scraping engine (LinkedInScraper) & classification (JobClassifier)
-├── requirements.txt   # Dependencies (streamlit, requests, beautifulsoup4, pandas)
-└── README.md          # Project documentation and guide
+├── app.py                      # Streamlit interactive application & modern UI
+├── scraper.py                  # JobDiscoveryEngine coordinator & JobClassifier
+├── dedup.py                    # Multi-signal deduplication & false-merge protection
+├── sources/                    # Modular source adapters
+│   ├── __init__.py             # Source registry exports
+│   ├── base.py                 # UnifiedJob data model & BaseJobSource interface
+│   ├── linkedin.py             # LinkedIn guest scraping adapter
+│   ├── tanqeeb.py              # Tanqeeb regional multi-country adapter
+│   └── remotive.py             # Optional remote job board adapter
+├── requirements.txt            # Python dependencies
+└── README.md                   # Project documentation
 ```
 
 ---
 
-## 💡 Best Practices for Optimal Search Results
-- **Looking for an Internship?** Enter only the core discipline (e.g., `Flutter` or `Python`) and select `Internship (تدريب طلبة وخريجين)`. Emad will automatically discard any postings requiring prior experience.
-- **Multi-Role Searches:** Separate multiple roles with a comma (e.g., `Data Analyst, Business Intelligence`).
-- **Target Fresh Postings:** Applying to roles posted within the **past 24 hours** or **past week** significantly boosts profile visibility with recruiters.
+## 🚀 Quick Start (Local Setup)
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/0xQenawy/job-scrabbing.git
+cd job-scaraping
+```
+
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run the App
+```bash
+streamlit run app.py
+```
+
+Open your browser at **`http://localhost:8501`**, specify your target role, pick your country/city, and let Emad do the work!
+
+---
+
+## 🗺️ Supported Geographic Coverage
+
+| Country | Coverage Highlights |
+|---|---|
+| **Egypt 🇪🇬** | Cairo, Giza, Alexandria, Mansoura / Dakahlia, Tanta, Zagazig, Canal Cities, Upper Egypt, Red Sea, etc. |
+| **Saudi Arabia 🇸🇦** | Riyadh, Jeddah, Eastern Province (Dammam / Khobar), Mecca, Medina, etc. |
+| **UAE 🇦🇪** | Dubai, Abu Dhabi, Sharjah, Ajman, etc. |
+| **Custom / Worldwide 🌍** | Support for any custom city or international search. |
+
+---
+
+## 💡 Tips for Best Results
+- **Looking for Internships?** Enter just the core technology (e.g. `Flutter` or `React`) and select `تدريب طلبة وخريجين (Internship)` from the seniority dropdown. Emad will filter out all senior noise and experienced roles automatically.
+- **Multiple Roles:** Search for multiple related titles at once separated by commas (e.g. `Frontend, React, Web`).
+- **Direct Application:** Clicking the apply button opens the original direct application page without passing through unneeded redirects.
+
+---
+
+<div align="center">
+Built with ❤️ for every job hunter in the Arab world.
+</div>
