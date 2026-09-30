@@ -9,7 +9,7 @@ from urllib.parse import quote_plus
 import requests
 from bs4 import BeautifulSoup 
 
-from sources import BaseJobSource, LinkedInSource, RemotiveSource, TanqeebSource, UnifiedJob
+from sources import BaseJobSource, LinkedInSource, TanqeebSource, UnifiedJob
 from dedup import JobDeduplicator
 
 logger = logging.getLogger(__name__)

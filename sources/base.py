@@ -50,7 +50,7 @@ class BaseJobSource(ABC):
     @property
     @abstractmethod
     def source_name(self) -> str:
-        """Name of the job source (e.g. 'LinkedIn', 'Remotive')."""
+        """Name of the job source (e.g. 'LinkedIn', 'Tanqeeb')."""
         pass
 
     @abstractmethod

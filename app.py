@@ -464,12 +464,6 @@ st.markdown(
         color: #70b5f9;
         font-weight: 700;
     }
-    .job-badge-source-remotive {
-        background: rgba(235, 87, 87, 0.15);
-        border-color: rgba(235, 87, 87, 0.4);
-        color: #ff8585;
-        font-weight: 700;
-    }
     .job-badge-source-tanqeeb {
         background: rgba(46, 160, 67, 0.15);
         border-color: rgba(46, 160, 67, 0.45);
@@ -1010,9 +1004,6 @@ if results:
         elif "Tanqeeb" in sources:
             source_html = '<span class="job-badge job-badge-source-tanqeeb">Tanqeeb (تنقيب)</span>'
             btn_text = "قدّم على Tanqeeb ↗"
-        elif "Remotive" in sources:
-            source_html = '<span class="job-badge job-badge-source-remotive">Remotive</span>'
-            btn_text = "قدّم على Remotive ↗"
         else:
             source_html = '<span class="job-badge job-badge-source-linkedin">LinkedIn</span>'
             btn_text = "قدّم على LinkedIn ↗"

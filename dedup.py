@@ -198,9 +198,9 @@ class JobDeduplicator:
         """Merge duplicate job into primary job, retaining all sources and best apply link."""
         merged_sources = list(dict.fromkeys(primary.sources + duplicate.sources))
 
-        # Select best primary application URL (prefer direct career page or Remotive over generic)
+        # Select best primary application URL (prefer direct career page or Tanqeeb over generic)
         best_url = primary.primary_application_url or primary.url
-        if "remotive.com" in (duplicate.primary_application_url or "") and "linkedin.com" in best_url:
+        if "tanqeeb.com" in (duplicate.primary_application_url or "") and "linkedin.com" in best_url:
             best_url = duplicate.primary_application_url or duplicate.url
 
         # Select more comprehensive description

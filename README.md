@@ -125,8 +125,7 @@ job-scaraping/
 │   ├── __init__.py             # Source registry exports
 │   ├── base.py                 # UnifiedJob data model & BaseJobSource interface
 │   ├── linkedin.py             # LinkedIn guest scraping adapter
-│   ├── tanqeeb.py              # Tanqeeb regional multi-country adapter
-│   └── remotive.py             # Optional remote job board adapter
+│   └── tanqeeb.py              # Tanqeeb regional multi-country adapter (Egypt, Saudi, UAE)
 ├── requirements.txt            # Python dependencies
 └── README.md                   # Project documentation
 ```
