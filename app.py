@@ -1009,9 +1009,22 @@ if results:
             btn_text = "قدّم على LinkedIn ↗"
 
         seniority = html.escape(str(job.get("مستوى الخبرة", "غير محدد")))
-        seniority_html = f'<span class="job-badge job-badge-seniority">{seniority}</span>' if seniority != "غير محدد" else ""
 
-        if "تدريب" in job_type or "Intern" in job_type:
+        is_intern_type = "تدريب" in job_type or "intern" in job_type.lower()
+        is_intern_seniority = "تدريب" in seniority or "intern" in seniority.lower()
+        is_grad_type = "خريجين" in job_type or "graduate" in job_type.lower()
+        is_grad_seniority = "خريجين" in seniority or "graduate" in seniority.lower()
+
+        # Suppress redundant seniority badge if job_type already conveys the same concept
+        if (is_intern_type and is_intern_seniority) or (is_grad_type and is_grad_seniority) or (job_type != "غير محدد" and job_type == seniority):
+            seniority_html = ""
+        elif seniority != "غير محدد":
+            seniority_badge_class = "job-badge-intern" if is_intern_seniority else "job-badge-seniority"
+            seniority_html = f'<span class="job-badge {seniority_badge_class}">{seniority}</span>'
+        else:
+            seniority_html = ""
+
+        if is_intern_type:
             type_badge_class = "job-badge-intern"
         elif "عقد" in job_type or "Contract" in job_type or "حر" in job_type or "Freelance" in job_type:
             type_badge_class = "job-badge-contract"
