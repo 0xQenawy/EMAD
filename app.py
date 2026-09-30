@@ -542,12 +542,160 @@ st.markdown(
         color: #58a6ff !important;
     }
 
-    /* ─── Responsive ────────────────────────────────────────── */
+    /* ─── Responsive (Mobile & Tablets) ─────────────────────── */
     @media (max-width: 768px) {
-        .block-container { padding-left: 1rem !important; padding-right: 1rem !important; }
-        .emad-title { font-size: 1.8rem; }
-        .search-card { padding: 1.2rem 1rem 1rem; }
-        .stRadio > div { flex-direction: column !important; }
+        .block-container {
+            padding-left: 0.85rem !important;
+            padding-right: 0.85rem !important;
+            padding-top: 1.5rem !important;
+            padding-bottom: 2rem !important;
+        }
+        .emad-header {
+            margin-bottom: 1.5rem !important;
+        }
+        .emad-title {
+            font-size: 1.6rem !important;
+            line-height: 1.35 !important;
+        }
+        .emad-sub {
+            font-size: 0.88rem !important;
+            line-height: 1.6 !important;
+            padding: 0 0.5rem !important;
+        }
+        .search-card {
+            padding: 1.1rem 0.9rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: 10px !important;
+        }
+        .stRadio > div {
+            flex-direction: column !important;
+        }
+
+        /* Metrics grid: 2x2 on mobile */
+        [data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem !important;
+        }
+        [data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) > [data-testid="stColumn"] {
+            width: 100% !important;
+            min-width: 0 !important;
+            padding: 0 !important;
+        }
+        [data-testid="stMetric"] {
+            padding: 0.65rem 0.75rem !important;
+            min-height: 75px !important;
+            border-radius: 8px !important;
+        }
+        [data-testid="stMetricLabel"] {
+            font-size: 0.72rem !important;
+            line-height: 1.3 !important;
+            white-space: normal !important;
+        }
+        [data-testid="stMetricValue"] {
+            font-size: 1.3rem !important;
+            line-height: 1.2 !important;
+        }
+
+        /* Top Bar results header & download button */
+        .stDownloadButton > button {
+            width: 100% !important;
+            margin-top: 0.4rem !important;
+            font-size: 0.85rem !important;
+            padding: 0.6rem 0.8rem !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+        }
+
+        /* Job Cards on Mobile: Vertical Stack (Zero Overlap) */
+        .jobs-container {
+            gap: 0.75rem !important;
+        }
+        .job-card {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            padding: 1rem 0.95rem !important;
+            gap: 0.85rem !important;
+            border-radius: 10px !important;
+        }
+        .job-card-main {
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+        .job-card-header {
+            margin-bottom: 0.45rem !important;
+        }
+        .job-title {
+            font-size: 1.05rem !important;
+            line-height: 1.35 !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+        }
+        .job-company {
+            font-size: 0.88rem !important;
+            flex-wrap: wrap !important;
+            gap: 4px !important;
+        }
+        .job-badges {
+            gap: 0.35rem !important;
+            margin-top: 0.45rem !important;
+        }
+        .job-badge {
+            font-size: 0.73rem !important;
+            padding: 0.2rem 0.5rem !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            line-height: 1.3 !important;
+        }
+        .job-card-action {
+            width: 100% !important;
+            margin-top: 0.25rem !important;
+            display: block !important;
+        }
+        .job-apply-btn {
+            width: 100% !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+            padding: 0.75rem 1rem !important;
+            font-size: 0.92rem !important;
+            border-radius: 8px !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Active Filter Pills Bar on Mobile */
+        .active-filters-row {
+            gap: 5px !important;
+            padding-top: 0.6rem !important;
+            margin-top: 0.65rem !important;
+        }
+        .filter-pill {
+            font-size: 0.72rem !important;
+            padding: 0.2rem 0.55rem !important;
+        }
+        .active-filters-title {
+            font-size: 0.72rem !important;
+        }
+    }
+
+    /* Extra small mobile adjustments */
+    @media (max-width: 420px) {
+        .emad-title {
+            font-size: 1.35rem !important;
+        }
+        .job-title {
+            font-size: 0.98rem !important;
+        }
+        [data-testid="stMetricValue"] {
+            font-size: 1.15rem !important;
+        }
+        [data-testid="stMetricLabel"] {
+            font-size: 0.68rem !important;
+        }
     }
 
     /* ─── Hide Streamlit branding ───────────────────────────── */
@@ -675,7 +823,7 @@ with col_sen:
         " مستوى الخبرة (Seniority)",
         options=list(SENIORITY_LEVELS.keys()),
         index=0,
-        help="مبتدئ، متوسط، سينيور، أو تدريب.. عماد هيفلترلك المسمى بدقة.",
+        help="مبتدئ، متوسط، سينيور، أو تدريب.. عماد هيفلترلك المسمى.",
     )
     selected_seniority = SENIORITY_LEVELS[seniority_label]
 
@@ -684,7 +832,7 @@ with col_wp:
         "طريقة الشغل (بيئة العمل)",
         options=list(WORKPLACE_TYPES.keys()),
         index=0,
-        help="عايز تشتغل من البيت وتحت التكييف، ولا مستعد تنزل مقر الشركة؟",
+        help="عايز تشتغل من البيت وتحت التكييف ولا مستعد تنزل مقر الشركة؟",
     )
     selected_workplace = WORKPLACE_TYPES[workplace_label]
 
@@ -720,7 +868,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 
 # Search Action Button
 st.markdown("<div style='height:0.2rem'></div>", unsafe_allow_html=True)
-search_clicked = st.button("شوفلي الشغل يا عماد", type="primary", use_container_width=True)
+search_clicked = st.button("شوفلي الشغل ", type="primary", use_container_width=True)
 st.markdown("<div style='height:1.5rem'></div>", unsafe_allow_html=True)
 
 # Search execution and results state handling
@@ -773,7 +921,7 @@ if search_clicked:
                 pass
 
         try:
-            with st.spinner("عماد شمّر ونازل يدور في LinkedIn و Tanqeeb.. ثواني وجايلك بالفرص"):
+            with st.spinner("...ثواني وجايلك بالفرص"):
                 jobs = engine.discover(
                     keywords=keywords,
                     location=effective_location,
@@ -789,7 +937,7 @@ if search_clicked:
         except Exception as e:
             search_attempted = False
             st.session_state["scraped_jobs"] = []
-            st.error(f"حصلت مشكلة وأنا بدور: {e}. استرها معايا وجرب تاني")
+            st.error(f"حصلت مشكلة وأنا بدور: {e}. استرها عليا وجرب تاني")
             try:
                 with open("crash.log", "a", encoding="utf-8") as f:
                     import traceback
